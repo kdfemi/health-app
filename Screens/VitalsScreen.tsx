@@ -10,6 +10,7 @@ import Colors from '../constants/Colors';
 import TextField from '../Components/Text';
 import Calender from '../Components/Calender/Calender';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { StatusBar } from 'expo-status-bar';
 
 export interface VitalsScreenProps {
     navigation: CompositeNavigationProp<StackNavigationProp<any, 'VitalsScreen'>, BottomTabNavigationProp<any>>;
@@ -24,7 +25,7 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
       headerLeft: () => (<Hamburger/>),
       headerRight: () => (
         <HeaderButtons HeaderButtonComponent={IoniconsHeaderButton}>
-            <Item title="Add" iconName="ios-add" onPress={() => console.log('Working')} color="#fff"/>
+            <Item title="Add" iconName="ios-add" onPress={() => console.log('Working')} color={Colors.white}/>
       </HeaderButtons>
     )
     })
@@ -35,10 +36,9 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
         <View style={styles.welcome}>
           <TextField>SEPT 21, 2020</TextField>
           <TextField style={{fontSize: 19, marginTop: 7}}>How are you feeling today?</TextField>
-
         </View>
-        <ScrollView style={{marginTop: 70, flex: 1, width: '100%'}} contentContainerStyle={{flex: 1}}>
-          <View style={{flexDirection: 'row', flex: 1, backgroundColor: 'green'}}>
+        <ScrollView style={styles.cardView} contentContainerStyle={{flex: 1}}>
+          <View style={[styles.mosaicView, {backgroundColor: 'green'}]}>
             <View style={{flex: 1}}>
               <View style={{flex: 1,  backgroundColor: 'red'}}></View>
               <View style={{flex: 2,  backgroundColor: 'blue'}}></View>
@@ -56,12 +56,13 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
         <View style={styles.FAB}>
           <ImageBackground source={require('../assets/btn_vector.png')} style={{width: 80, height: 80, overflow: 'hidden', justifyContent: 'center', alignItems: 'center' }}>
             <TouchableOpacity activeOpacity={0.8} 
-              onPress={() => props.navigation.navigate('')}
+              onPress={() => props.navigation.navigate('MeasureVitalsScreen')}
             style={{width: 70, height: 70, backgroundColor: Colors.white, borderRadius: 35, justifyContent: 'center', alignItems: 'center'}}>
               <TextField style={{color: Colors.primary, textAlign: 'center'}}>Measure Now</TextField>
             </TouchableOpacity>
           </ImageBackground>
         </View>
+        <StatusBar translucent={true} style="light"/>
       </View>
     
   );
@@ -86,6 +87,15 @@ const styles = StyleSheet.create({
       padding: 5,
       position: 'absolute',
       top: 60, zIndex: 99
+    },
+    cardView: {
+      marginTop: 70, 
+      flex: 1, 
+      width: '100%'
+    },
+    mosaicView: {
+      flexDirection: 'row', 
+      flex: 1,
     },
     FAB: {
       position: 'absolute',
