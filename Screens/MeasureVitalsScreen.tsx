@@ -14,6 +14,7 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { color } from 'react-native-reanimated';
 import { StatusBar } from 'expo-status-bar';
 import Button from '../Components/Button/Button';
+import HealthCard from '../Components/HealthCard/HealthCard';
 
 export interface MeasureVitalsScreenProps {
     navigation: CompositeNavigationProp<StackNavigationProp<any, 'MeasureVitalsScreen'>, BottomTabNavigationProp<any>>;
@@ -55,12 +56,9 @@ const MeasureVitalsScreen: FC<MeasureVitalsScreenProps> = (props) => {
             </View>
         </View>
         <ScrollView style={{ flex: 1, width: '100%'}} contentContainerStyle={styles.scrollViewInner}>
-            <View style={styles.healthCard}>
-                <View style={styles.healthCardLeft}></View>
-                <View  style={styles.healthCardRight}>
-                    <View style={styles.healthCardOverlay}/>
-                </View>
-            </View>
+            <HealthCard onPress={() => console.log('Clicked')} style={styles.healthCard}/>
+            <HealthCard onPress={() => console.log('Clicked')} style={styles.healthCard}/>
+            <HealthCard onPress={() => console.log('Clicked')} style={styles.healthCard}/>
             <Button >Complete</Button>
         </ScrollView>
         <StatusBar translucent={true} style="dark"/>
@@ -113,29 +111,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     healthCard: {
-        backgroundColor: Colors.white1,
-        borderRadius: 10,
-        height: 150,
-        flexDirection: 'row'
-    },
-    healthCardLeft: {
-        flexDirection: 'row',
-        flex: 1,
-        padding: 5,
-    },
-    healthCardRight: {
-        flex: 2,
-        padding: 5,
-    },
-    healthCardOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: Colors.primary,
-        opacity: 0.8,
-        borderRadius: 10,
+        marginVertical: 5
     }
 });
 
