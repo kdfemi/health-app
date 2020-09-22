@@ -4,9 +4,9 @@ import Colors from "../../constants/Colors";
 
 function Hamburger(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <Svg width={60} height={60} viewBox="0 0 66 66" fill="none" {...props}>
+    <Svg width={66} height={66} viewBox="0 0 66 66" fill="none" {...props}>
       <G filter="url(#prefix__filter0_d)">
-        <Circle cx={33} cy={29} r={18} fill="none" />
+        <Circle cx={33} cy={29} r={32} fill="none" />
       </G>
       <Path fill={Colors.white} fillOpacity={0} d="M18 14h30v30H18z" />
       <Path

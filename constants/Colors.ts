@@ -5,5 +5,6 @@ export default {
     grey: 'grey',
     black: '#000',
     secondary: '#FD2272',
-    tertiary: '#07BCC5'
+    tertiary: '#07BCC5',
+    red: '#E10F16'
 };

@@ -7,12 +7,14 @@ export interface ButtonProps extends TouchableOpacityProps {
   innerStyle?: TextStyle,
   color?: string,
   backgroundColor?: string
+  disabled?: boolean | undefined;
 }
 const Button: React.FC<ButtonProps> = props => {
     return  <TouchableOpacity activeOpacity={0.5} {...props} style={{...styles.button, ...props.style as ViewStyle,
      
       ...(props.backgroundColor)?{backgroundColor: props.backgroundColor} :  
       (props.type === 'clear')? styles.clear : (props.type === 'outline')? styles.outline : styles.fill,
+      ...( typeof props.disabled !== 'undefined' && props.disabled)? styles.disabled : null
     }} onPress={props.onPress} >
     <Text style={{...styles.text,
    ...(props.color)?{color: props.color} : 
@@ -43,9 +45,8 @@ const styles = StyleSheet.create({
       borderStyle: 'solid'
     },
     text: {
-      fontSize: 15,
+      fontSize: 16,
       textAlign: 'center',
-    
       textAlignVertical: 'center'
     },
     textClear: {
@@ -56,6 +57,12 @@ const styles = StyleSheet.create({
     },
     textOutline: {
       color: Colors.primary
+    },
+    disabled: {
+      backgroundColor: Colors.grey,
+      borderColor: Colors.grey,
+      borderWidth: 1,
+      borderStyle: 'solid'
     }
 })
 
