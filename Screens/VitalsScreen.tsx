@@ -46,7 +46,9 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    const date = new Date();
+    let date = new Date();
+    if(selectedDate)
+      date = selectedDate as Date;
     date.setHours(0,0,0,0);
     setSelectedDate(date);
     getVitals(date)
@@ -116,6 +118,7 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
 
   const getDataForSelectedDate =  async (date: Date) => {
     setSelectedDate(date);
+    setIsFetchingData(true);
     getVitals(date)
   }
 
@@ -131,6 +134,7 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {!isFetchingData ?
+          vitalsData ?
         <View style={[styles.mosaicView]}>
           {/* Left */}
           <View style={{flex: 1}}>
@@ -213,6 +217,10 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
                 <TextField style={{color: Colors.primary}}>facexxxxxxx</TextField>
             </View>
           </View>
+        </View> : 
+
+        <View style={{justifyContent: 'center', alignItems:  'center', flex: 1}}>
+          <TextField style={{color: Colors.primary}}>You don't have any record for the selected date</TextField>
         </View>
         
         : <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
