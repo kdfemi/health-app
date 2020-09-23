@@ -99,15 +99,20 @@ const MeasureVitalsScreen: FC<MeasureVitalsScreenProps> = (props) => {
   }
 
   const submitData = async () => {
+      const date = new Date(new Date().getTime());
+      date.setHours(0,0,0,0);
+      console.log(date)
     const requestData: PostVitalsRequestData = {
-    bpm, date: new Date().toISOString(), 
+    bpm, date: date.toISOString(), 
     mmHg: blood, spo2: osp,  temp: temperature, 
-    user: '5f6a113a8bb9e14b83dddbda'
+    user: '5f69dec3f542ca47b40b3fc3'
     }
+    console.log(requestData)
     setIsSubmitting(true);
     try {
         const response = await axiosInstance.post<Array<VitalsResponseData>>('/record', requestData);
-        if(response.status === 201) {
+        console.log(response.status)
+        if(response.status === 200) {
             props.navigation.navigate('Vitals', { screen: 'VitalsScreen',
             params: { measurementId: response.data[0]._id } 
             })
@@ -116,11 +121,12 @@ const MeasureVitalsScreen: FC<MeasureVitalsScreenProps> = (props) => {
         }
     } catch (error) {
         const serverError = error as AxiosError;
+        console.log(serverError.request)
         if (serverError.response) {
-            console.log(serverError.message);
-            Alert.alert('Error', serverError.message)
+            // console.log(serverError.message);
+            Alert.alert('Error', serverError.request._response)
         } else {
-            Alert.alert('Error', 'An unknown Error occurred')
+            Alert.alert('Error', serverError.message)
             console.log(serverError.message);
         }
     }finally {

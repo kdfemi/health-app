@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { View, StyleSheet, ImageBackground, Image, ActivityIndicator, Platform, Alert} from 'react-native';
+import { View, StyleSheet, ImageBackground, Image, ActivityIndicator, Platform, Alert, RefreshControl} from 'react-native';
 import { CompositeNavigationProp, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -31,6 +31,9 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
   const cancelToken = useRef<CancelTokenSource>();
   const [isFetchingData, setIsFetchingData] = useState(true);
   const [vitalsData, setVitalsData] = useState<VitalsResponseData>();
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [selectedDate, setSelectedDate] = React.useState<Date>();
+
   useLayoutEffect(() => {
     props.navigation.setOptions({
       headerLeft: () => (<Hamburger/>),
@@ -44,8 +47,9 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
 
   useEffect(() => {
     const date = new Date();
-    date.setHours(0,0,0,0)
-    getDataForSelectedDate(date)
+    date.setHours(0,0,0,0);
+    setSelectedDate(date);
+    getVitals(date)
     return () => {
       if ( typeof cancelToken.current != typeof undefined) {
         cancelToken.current?.cancel("Operation canceled due unmounted");
@@ -54,7 +58,6 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log('params change')
     if(props.route.params) {
       const date = new Date();
       date.setHours(0,0,0,0)
@@ -67,8 +70,12 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
     }
   }, [props.route.params]);
 
-  const getDataForSelectedDate = useCallback( async (date: Date) => {
-    setIsFetchingData(true);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getVitals(selectedDate as Date);
+  };
+
+  const getVitals = useCallback(async (date: Date) => {
     if ( typeof cancelToken.current != typeof undefined) {
       cancelToken.current?.cancel("Operation canceled due to new request.");
     }
@@ -83,7 +90,9 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
       if(response.status === 200) {
         setVitalsData(response.data[0])
       } else {
-        Alert.alert('Error', 'couldn\'t fetch data')
+        Alert.alert('Error', 'couldn\'t fetch data', [{text: 'Retry',
+        onPress: () => getVitals(selectedDate as Date)
+        }])
       }
     } catch (error) {
       const serverError = error as AxiosError;
@@ -91,17 +100,24 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
         console.log(serverError.message);
       } else {
         if (serverError.response) {
-          Alert.alert('Error', serverError.message)
+          Alert.alert('Error', serverError.request._response)
         } else {
-          Alert.alert('Error', 'An unknown Error occurred')
+          Alert.alert('Error', 'An unknown Error occurred', [{text: 'Retry',
+          onPress: () => getVitals(selectedDate as Date)
+          }])
           console.log(serverError.message);
         }
       }
     }finally {
-      setIsFetchingData(false)
+      setIsFetchingData(false);
+      setRefreshing(false);
     }
-
   }, []);
+
+  const getDataForSelectedDate =  async (date: Date) => {
+    setSelectedDate(date);
+    getVitals(date)
+  }
 
 
   return ( 
@@ -110,7 +126,10 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
         <TextField>SEPT 21, 2020</TextField>
         <TextField style={{fontSize: 20, marginTop: 7}}>How are you feeling today?</TextField>
       </View>
-      <ScrollView style={styles.cardView} contentContainerStyle={{flexGrow: 1}}>
+      <ScrollView style={styles.cardView} contentContainerStyle={{flexGrow: 1}} 
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
         {!isFetchingData ?
         <View style={[styles.mosaicView]}>
           {/* Left */}
@@ -195,6 +214,7 @@ const VitalsScreen: FC<VitalsScreenProps> = (props) => {
             </View>
           </View>
         </View>
+        
         : <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <ActivityIndicator size="large"/>
             <TextField style={{color: Colors.primary}}>Fetching Vitals</TextField>
