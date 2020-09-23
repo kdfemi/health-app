@@ -1,6 +1,6 @@
 
 import React, { FC, useEffect, useLayoutEffect, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator} from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Alert} from 'react-native';
 import { CompositeNavigationProp, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -15,7 +15,10 @@ import HealthCard from '../Components/HealthCard/HealthCard';
 import { FontAwesome } from '@expo/vector-icons';
 import { Fontisto } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
-
+import axiosInstance from '../axios/axios';
+import { AxiosError } from 'axios';
+import VitalsResponseData from '../axios/request-data/vitals-response-data';
+import PostVitalsRequestData from '../axios/request-data/post-vitals-request-data';
 
 export interface MeasureVitalsScreenProps {
     navigation: CompositeNavigationProp<StackNavigationProp<any, 'MeasureVitalsScreen'>, BottomTabNavigationProp<any>>;
@@ -51,6 +54,9 @@ const MeasureVitalsScreen: FC<MeasureVitalsScreenProps> = (props) => {
     const [ospIsLoading, setOspIsLoading] = useState<boolean>(false);
 
     const [buttonActive, setButtonActive] = useState(false);
+
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
 
     useEffect(() => {
         if(temperatureIsLoading || bpmIsLoading || bpmIsLoading || ospIsLoading) {
@@ -92,11 +98,34 @@ const MeasureVitalsScreen: FC<MeasureVitalsScreenProps> = (props) => {
     setActiveSegment(segment);
   }
 
-  const submitData = () => {
-      console.log('Clicked')
-      props.navigation.navigate('Vitals', { screen: 'VitalsScreen',
-       params: { temperature, blood, bpm, osp } 
-        })
+  const submitData = async () => {
+    const requestData: PostVitalsRequestData = {
+    bpm, date: new Date().toISOString(), 
+    mmHg: blood, spo2: osp,  temp: temperature, 
+    user: '5f6a113a8bb9e14b83dddbda'
+    }
+    setIsSubmitting(true);
+    try {
+        const response = await axiosInstance.post<Array<VitalsResponseData>>('/record', requestData);
+        if(response.status === 201) {
+            props.navigation.navigate('Vitals', { screen: 'VitalsScreen',
+            params: { measurementId: response.data[0]._id } 
+            })
+        } else {
+            Alert.alert('Error', 'couldn\'t send data')
+        }
+    } catch (error) {
+        const serverError = error as AxiosError;
+        if (serverError.response) {
+            console.log(serverError.message);
+            Alert.alert('Error', serverError.message)
+        } else {
+            Alert.alert('Error', 'An unknown Error occurred')
+            console.log(serverError.message);
+        }
+    }finally {
+        setIsSubmitting(false)
+    }
   }
 
     return ( 
@@ -161,7 +190,8 @@ const MeasureVitalsScreen: FC<MeasureVitalsScreenProps> = (props) => {
                 </View>
             </HealthCard>
             
-            <Button disabled={!buttonActive} onPress={submitData} style={styles.button}>Complete</Button>
+            <Button disabled={!buttonActive} onPress={submitData} style={styles.button}>
+                {isSubmitting? <ActivityIndicator size="small" color={Colors.white}/> : 'Complete'}</Button>
         </ScrollView>
         <StatusBar translucent={true} style="dark"/>
     </View>
@@ -214,7 +244,8 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     healthCard: {
-        marginVertical: 10
+        marginVertical: 10,
+        maxWidth: 700
     },
     vitalValue: {
         color: Colors.primary,

@@ -5,12 +5,13 @@ import Colors from '../../constants/Colors';
 import TextField from '../Text';
 
 export interface CalenderProps {
-    // days: Date[]
+    onClick?: (date: Date) => unknown
 }
 
 const getPivotalDays = () => {
     const dayToMilliseconds = 8.64e+7;
     const presentDate = new Date();
+    presentDate.setHours(0,0,0,0)
     const presentDateMillSeconds = presentDate.getTime();
     let day = 3;
     const days = new Array<Date>().fill(new Date(), 0 , 6);
@@ -35,7 +36,12 @@ const Calender:FC<CalenderProps> = (props) => {
     const [dates, setDates] = useState<Date[]>(getPivotalDays());
     const [activeIndex, setActiveIndex] = useState(3);
 
-    const selectedDate = (selectedIndex: number) => setActiveIndex(selectedIndex)
+    const selectedDate = (selectedIndex: number) => {
+        setActiveIndex(selectedIndex);
+        if(props.onClick) {
+            props.onClick(dates[selectedIndex]);
+        }
+    }
     return (
         <View style={styles.container}>
             {dates.map((date, index) => 
@@ -86,4 +92,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Calender;
+export default React.memo(Calender);

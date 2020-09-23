@@ -10,7 +10,7 @@ export interface LineGraphProps {
 }
 const  LineGraph: FC<LineGraphProps> = (props) => {
 
-    const data = [50, 10, 40, 95, -4, -24, 85, 91, 35, 53, -53, 24, 50, -20, -80]
+    const data = [100, 10, 40, 95, 4, 24, 85, 91, 35, 53, 53, 24, 50, 20, 80]
     const yCardinal = [ 97, 98, 99 ]
     const axesSvg = { fontSize: 10, fill: Colors.white };
     const verticalContentInset = { top: 10, bottom: 10 }
@@ -24,7 +24,7 @@ const  LineGraph: FC<LineGraphProps> = (props) => {
         )
 
     return (
-        <View style={{ height: 120, flexDirection: 'row' }}>
+        <View style={{ minHeight: 120, flexDirection: 'row' }}>
                <YAxis
                     data={yCardinal}
                     style={{ marginBottom: 0 }}
@@ -39,7 +39,7 @@ const  LineGraph: FC<LineGraphProps> = (props) => {
                         svg={{ stroke: Colors.white }}
                         curve={shape.curveCardinalOpen}
                     >
-                        <Grid/>
+                        {/* <Grid/> */}
                     </LineChart>
                 </View>
             </View>
